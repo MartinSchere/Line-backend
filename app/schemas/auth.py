@@ -54,7 +54,6 @@ class CreateStore(graphene.Mutation):
         longitude = graphene.Float(required=True)
         opening_time = graphene.DateTime(required=True)
         closing_time = graphene.DateTime(required=True)
-        opening_days = graphene.(required=True)
 
     def mutate(self, info, username, password, latitude, longitude, opening_time, closing_time):
         user = get_user_model()(
