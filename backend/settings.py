@@ -13,7 +13,7 @@ SECRET_KEY = '@tv45djul)*x3*v9swi93_i%e+xu0(d80j&*8c$vc6y3xhe5e4'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['martinsch-line-server.herokuapp.com']
+ALLOWED_HOSTS = ['martinsch-line-server.herokuapp.com', '127.0.0.1']
 
 
 # Application definition
