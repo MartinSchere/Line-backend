@@ -3,8 +3,9 @@ from django.utils import timezone
 from datetime import datetime, date, timedelta
 
 from multiselectfield import MultiSelectField
+from django.contrib.gis.db.models import PointField
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User as AuthUser
 
 DAY_CHOICES = (
     ('Mo', 'Monday'),
@@ -17,41 +18,32 @@ DAY_CHOICES = (
 )
 
 
-class Store(models.Model):
-    name = models.CharField(max_length=20)
-    latitude = models.DecimalField(max_digits=25, decimal_places=15)
-    longitude = models.DecimalField(max_digits=25, decimal_places=15)
-    opening_time = models.TimeField()
-    closing_time = models.TimeField()
-    user = models.OneToOneField(
-        User, primary_key=True, on_delete=models.CASCADE, related_name='stores')
-    is_open = models.BooleanField(null=True, blank=True)
-    opening_days = models.CharField(
-        choices=DAY_CHOICES, max_length=2)
-    # image = models.ImageField(upload_to=)
-
-    @property
-    def average_wait_time(self):
-        turns = self.turns
-        total_time = [datetime.combine(date.min, turn.completion_time) - datetime.combine(
-            date.min, turn.creation_time) for turn in turns.all()]
-        sum = timedelta()
-        for i in total_time:
-            sum += i
-
-        average_time = sum / turns.count()
-        return str((average_time.seconds//60) % 60)
-
-    def __str__(self):
-        return self.name
-
-
 class User(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(AuthUser, on_delete=models.CASCADE)
+    """
+    Not using the AbstractUser model because then we would need
+    to point the stores to this one to use the auth system.
+    """
     full_name = models.CharField(max_length=20)
 
     def __str__(self):
         return self.full_name
+
+
+class Store(models.Model):
+    name = models.CharField(max_length=20)
+    location = PointField(srid=4326, geography=True, blank=True, null=True)
+    opening_time = models.TimeField()
+    closing_time = models.TimeField()
+    user = models.OneToOneField(
+        AuthUser, primary_key=True, on_delete=models.CASCADE, related_name='stores')
+    is_open = models.BooleanField(null=True, blank=True)
+    opening_days = MultiSelectField(
+        choices=DAY_CHOICES)
+    # image = models.ImageField(upload_to=)
+
+    def __str__(self):
+        return self.name
 
 
 class Turn(models.Model):

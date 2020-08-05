@@ -1,4 +1,5 @@
 from graphene_django.types import DjangoObjectType
+import graphql_geojson
 
 from django.contrib.auth import get_user_model
 
@@ -11,9 +12,10 @@ class TurnType(DjangoObjectType):
         model = Turn
 
 
-class StoreType(DjangoObjectType):
+class StoreType(graphql_geojson.GeoJSONType):
     class Meta:
         model = Store
+        geojson_field = 'location'
 
 
 class UserType(DjangoObjectType):

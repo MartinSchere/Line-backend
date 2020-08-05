@@ -8,7 +8,7 @@ from .types import UserType, StoreType
 from ..models import User, Store, Turn
 from django.contrib.auth import get_user_model
 
-from django.contrib.auth.models import User as AuthUser
+from django.contrib.gis.geos import Point
 
 
 class Query(graphene.ObjectType):
@@ -44,6 +44,16 @@ class CreateUser(graphene.Mutation):
         return CreateUser(user=user_model)
 
 
+class Weekdays(graphene.Enum):
+    MO = "Mo"
+    TU = "Tu"
+    WE = "We"
+    TH = "Th"
+    FR = "Fr"
+    SA = "Sa"
+    SU = "Su"
+
+
 class CreateStore(graphene.Mutation):
     store = graphene.Field(StoreType)
 
@@ -54,16 +64,17 @@ class CreateStore(graphene.Mutation):
         longitude = graphene.Float(required=True)
         opening_time = graphene.DateTime(required=True)
         closing_time = graphene.DateTime(required=True)
+        opening_days = graphene.Argument(graphene.List(Weekdays))
 
-    def mutate(self, info, username, password, latitude, longitude, opening_time, closing_time):
+    def mutate(self, info, username, password, latitude, longitude, opening_time, closing_time, opening_days):
         user = get_user_model()(
             username=username,
         )
         user.set_password(password)
-        user.save()
         store = Store(user=user, name=username,
-                      latitude=latitude, longitude=longitude,
-                      opening_time=opening_time, closing_time=closing_time)
+                      location=Point(latitude, longitude, srid=4326),
+                      opening_time=opening_time, closing_time=closing_time, opening_days=opening_days)
+        user.save()
         store.save()
         return CreateStore(store=store)
 
