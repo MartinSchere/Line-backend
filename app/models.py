@@ -10,8 +10,8 @@ from django.contrib.auth.models import User as AuthUser
 DAY_CHOICES = (
     ('Mo', 'Monday'),
     ('Tu', 'Tuesday'),
-    ('We', 'Wendnesday'),
-    ('Th', 'Monday'),
+    ('We', 'Wednesday'),
+    ('Th', 'Thursday'),
     ('Fr', 'Friday'),
     ('Sa', 'Saturday'),
     ('Su', 'Sunday'),

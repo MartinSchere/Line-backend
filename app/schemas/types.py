@@ -16,6 +16,7 @@ class StoreType(graphql_geojson.GeoJSONType):
     class Meta:
         model = Store
         geojson_field = 'location'
+        convert_choices_to_enum = False
 
 
 class UserType(DjangoObjectType):

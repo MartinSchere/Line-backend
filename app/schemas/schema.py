@@ -7,6 +7,8 @@ from ..models import User, Store, Turn
 
 import graphql_jwt
 import datetime
+from datetime import date
+import calendar
 
 from django.contrib.gis.db.models.functions import GeometryDistance
 from django.contrib.gis.geos import Point
@@ -14,6 +16,15 @@ from django.contrib.gis.measure import D
 
 from . import auth
 from .types import StoreType, UserType, TurnType, AuthUserType
+
+
+def is_store_open(store):
+    opening_days = str(store.opening_days).split(", ")
+    today = date.today()
+
+    return store.opening_time < datetime.datetime.now().time()\
+        and store.closing_time > datetime.datetime.now().time()\
+        and calendar.day_name[today.weekday()] in opening_days
 
 
 def check_login(info):
@@ -58,7 +69,8 @@ class Query(auth.Query, graphene.ObjectType):
     def resolve_search_store(self, info, name):
         check_login(info)
         store = Store.objects.get(name=name)
-        if store.opening_time < datetime.datetime.now().time() and store.closing_time > datetime.datetime.now().time():
+        print(store.opening_days)
+        if is_store_open(store):
             store.is_open = True
         else:
             store.is_open = False
