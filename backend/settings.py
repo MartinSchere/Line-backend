@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'app',
     'django.contrib.gis',
+    'algoliasearch_django'
 ]
 
 MIDDLEWARE = [
@@ -142,4 +143,10 @@ GRAPHENE = {
         'graphql_jwt.middleware.JSONWebTokenMiddleware',
     ],
 }
+
+ALGOLIA = {
+    'APPLICATION_ID': 'BQF2Q1AFJF',
+    'API_KEY': 'cbd3fe353bc490eaea77456ea82c288f'
+}
+
 django_heroku.settings(locals())

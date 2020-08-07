@@ -1,6 +1,8 @@
 import graphene
 from graphql import GraphQLError
 
+from algoliasearch_django import raw_search
+
 from django.db.models import Q
 from django.contrib.auth.models import User
 from ..models import User, Store, Turn
@@ -34,7 +36,7 @@ def check_login(info):
 
 class Query(auth.Query, graphene.ObjectType):
     all_stores = graphene.List(StoreType)
-    search_store = graphene.Field(
+    store_detail = graphene.Field(
         auth.StoreType, name=graphene.String(required=True))
     get_turns_for_user = graphene.List(TurnType)
     store_turns = graphene.List(
@@ -66,7 +68,7 @@ class Query(auth.Query, graphene.ObjectType):
             qs = qs[:first]
         return qs
 
-    def resolve_search_store(self, info, name):
+    def resolve_store_detail(self, info, name):
         check_login(info)
         store = Store.objects.get(name=name)
         print(store.opening_days)
