@@ -78,16 +78,6 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'dbcru2mbq9mgk7',
-        'USER': 'ydhzzzznrxhdlw',
-        'PASSWORD': 'da066c10cde2918f98c9df77ec96f7b7d25ca89a8a33633ed14e5463e795b58a',
-        'HOST': 'ec2-52-207-25-133.compute-1.amazonaws.com',
-        'PORT': '5432',
-    }
-}
 
 GDAL_LIBRARY_PATH = os.environ.get('GDAL_LIBRARY_PATH')
 GEOS_LIBRARY_PATH = os.environ.get('GEOS_LIBRARY_PATH')
@@ -146,3 +136,16 @@ GRAPHENE = {
 
 
 django_heroku.settings(locals())
+# Setting this at the bottom so Heroku doesn't
+# forget POSTGIS
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'dbcru2mbq9mgk7',
+        'USER': 'ydhzzzznrxhdlw',
+        'PASSWORD': 'da066c10cde2918f98c9df77ec96f7b7d25ca89a8a33633ed14e5463e795b58a',
+        'HOST': 'ec2-52-207-25-133.compute-1.amazonaws.com',
+        'PORT': '5432',
+    }
+}
