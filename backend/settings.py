@@ -80,11 +80,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'LineDB',
-        'USER': 'postgres',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': 'dbcru2mbq9mgk7',
+        'USER': 'ydhzzzznrxhdlw',
+        'PASSWORD': 'da066c10cde2918f98c9df77ec96f7b7d25ca89a8a33633ed14e5463e795b58a',
+        'HOST': 'ec2-52-207-25-133.compute-1.amazonaws.com',
+        'PORT': '5432',
     }
 }
 
