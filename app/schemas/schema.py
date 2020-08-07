@@ -1,8 +1,6 @@
 import graphene
 from graphql import GraphQLError
 
-from algoliasearch_django import raw_search
-
 from django.db.models import Q
 from django.contrib.auth.models import User
 from ..models import User, Store, Turn
