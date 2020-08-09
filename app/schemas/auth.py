@@ -72,7 +72,8 @@ class CreateStore(graphene.Mutation):
         )
         user.set_password(password)
         store = Store(user=user, name=username,
-                      location=Point(latitude, longitude, srid=4326),
+                      # X = lng, Y = lat
+                      location=Point(longitude, latitude, srid=4326),
                       opening_time=opening_time, closing_time=closing_time, opening_days=opening_days)
         user.save()
         store.save()

@@ -55,7 +55,7 @@ class Query(auth.Query, graphene.ObjectType):
 
     def resolve_nearby_stores(self, info, lat, lng, first=None, skip=None):
         check_login(info)
-        ref_location = Point(lat, lng, srid=4326)
+        ref_location = Point(lng, lat, srid=4326)  # X = lng, Y = lat
         qs = Store.objects.all()
         qs = qs.filter(location__dwithin=(
             ref_location, D(km=12.5))).annotate(distance=GeometryDistance("location", ref_location)).order_by("distance")
