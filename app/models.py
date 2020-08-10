@@ -25,6 +25,8 @@ class User(models.Model):
     to point the stores to this one to use the auth system.
     """
     full_name = models.CharField(max_length=20)
+    active_queues = models.IntegerField(default=0)
+    infractions = models.IntegerField(default=0)
 
     def __str__(self):
         return self.full_name

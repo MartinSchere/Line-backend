@@ -84,10 +84,11 @@ class Query(auth.Query, graphene.ObjectType):
         current_user = User.objects.get(user=info.context.user)
         turns = Turn.objects.filter(
             fullfilled_successfully=False, user_did_not_present=False, canceled=False, user=current_user)
-        for (index, turn) in enumerate(turns):
-            store = turns[index].store
-            turns[index].store.turns.set(Turn.objects.filter(
-                fullfilled_successfully=False, user_did_not_present=False, canceled=False, store=store))
+        if len(turns) > 0:
+            for (index, turn) in enumerate(turns):
+                store = turns[index].store
+                turns[index].store.turns.set(Turn.objects.filter(
+                    fullfilled_successfully=False, user_did_not_present=False, canceled=False, store=store))
         return turns
 
     def resolve_store_turns(self, info, completed, first=None, skip=None):
@@ -118,11 +119,19 @@ class CreateTurn(graphene.Mutation):
         check_login(info)
         store = Store.objects.get(name=store_name)
         user = User.objects.get(user=info.context.user)
-        if store.turns.filter(fullfilled_successfully=False, user_did_not_present=False, canceled=False, user=user).exists():
-            raise GraphQLError("User has already an active turn")
         # Selecting the user MODEL (not Django's)
+
+        if store.turns.filter(fullfilled_successfully=False, user_did_not_present=False, canceled=False, user=user).exists():
+            raise GraphQLError("You're already in this queue")
+        if user.active_queues >= 3:
+            raise GraphQLError(
+                "You can't be in more than 3 queues at the same time")
+
         turn = Turn(user=user, store=store)
+        user.active_queues += 1
         turn.save()
+        # print(user.active_queues)
+        user.save()
         return CreateTurn(turn=turn)
 
 
@@ -136,6 +145,8 @@ class CompleteTurnSuccessfully(graphene.Mutation):
         check_login(info)
         turn = Turn.objects.get(id=turn_id)
         turn.fullfilled_successfully = True
+        turn.user.active_queues -= 1
+        turn.user.save()
         turn.complete()
         turn.save()
         return CompleteTurnSuccessfully(turn=turn)
@@ -150,6 +161,8 @@ class CancelTurn(graphene.Mutation):
     def mutate(self, info, turn_id):
         check_login(info)
         turn = Turn.objects.get(id=turn_id)
+        turn.user.active_queues -= 1
+        turn.user.save()
         turn.canceled = True
         turn.complete()
         turn.save()
@@ -166,6 +179,9 @@ class UserDidNotPresent(graphene.Mutation):
         check_login(info)
         turn = Turn.objects.get(id=turn_id)
         turn.user_did_not_present = True
+        turn.user.active_queues -= 1
+        turn.user.infractions += 1
+        turn.user.save()
         turn.complete()
         turn.save()
         return UserDidNotPresent(turn=turn)
