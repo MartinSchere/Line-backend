@@ -35,7 +35,14 @@ def check_login(info):
 class Query(auth.Query, graphene.ObjectType):
     all_stores = graphene.List(StoreType)
     store_detail = graphene.Field(
-        auth.StoreType, name=graphene.String(required=True))
+        StoreType, name=graphene.String(required=True))
+    search_store = graphene.List(
+        StoreType, query=graphene.String(required=True),
+        lat=graphene.Float(required=True),
+        lng=graphene.Float(required=True),
+        first=graphene.Int(),
+        skip=graphene.Int(),
+    )
     get_turns_for_user = graphene.List(TurnType)
     store_turns = graphene.List(
         TurnType, completed=graphene.Boolean(required=True),
@@ -53,9 +60,22 @@ class Query(auth.Query, graphene.ObjectType):
         check_login(info)
         return Store.objects.all()
 
+    def resolve_search_store(self, info, query, lat, lng, first=None, skip=None):
+        check_login(info)
+        ref_location = Point(lat, lng, srid=4326)  # X = lng, Y = lat
+        qs = Store.objects.all()
+        qs = qs.filter(name__icontains=query, location__dwithin=(
+            ref_location, D(km=12.5))).annotate(distance=GeometryDistance("location", ref_location)).order_by("distance")
+
+        if skip:
+            qs = qs[skip:]
+        if first:
+            qs = qs[:first]
+        return qs
+
     def resolve_nearby_stores(self, info, lat, lng, first=None, skip=None):
         check_login(info)
-        ref_location = Point(lng, lat, srid=4326)  # X = lng, Y = lat
+        ref_location = Point(lat, lng, srid=4326)  # X = lng, Y = lat
         qs = Store.objects.all()
         qs = qs.filter(location__dwithin=(
             ref_location, D(km=12.5))).annotate(distance=GeometryDistance("location", ref_location)).order_by("distance")
