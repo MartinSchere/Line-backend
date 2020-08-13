@@ -62,7 +62,7 @@ class Query(auth.Query, graphene.ObjectType):
 
     def resolve_search_store(self, info, query, lat, lng, first=None, skip=None):
         check_login(info)
-        ref_location = Point(lat, lng, srid=4326)  # X = lng, Y = lat
+        ref_location = Point(lng, lat, srid=4326)  # X = lng, Y = lat
         qs = Store.objects.all()
         qs = qs.filter(name__icontains=query, location__dwithin=(
             ref_location, D(km=12.5))).annotate(distance=GeometryDistance("location", ref_location)).order_by("distance")
@@ -75,7 +75,7 @@ class Query(auth.Query, graphene.ObjectType):
 
     def resolve_nearby_stores(self, info, lat, lng, first=None, skip=None):
         check_login(info)
-        ref_location = Point(lat, lng, srid=4326)  # X = lng, Y = lat
+        ref_location = Point(lng, lat, srid=4326)  # X = lng, Y = lat
         qs = Store.objects.all()
         qs = qs.filter(location__dwithin=(
             ref_location, D(km=12.5))).annotate(distance=GeometryDistance("location", ref_location)).order_by("distance")
@@ -89,7 +89,7 @@ class Query(auth.Query, graphene.ObjectType):
     def resolve_store_detail(self, info, name):
         check_login(info)
         store = Store.objects.get(name=name)
-        print(store.opening_days)
+        print(store.turns)
         if is_store_open(store):
             store.is_open = True
         else:
@@ -150,6 +150,7 @@ class CreateTurn(graphene.Mutation):
         turn = Turn(user=user, store=store)
         user.active_queues += 1
         turn.save()
+        store.save()
         # print(user.active_queues)
         user.save()
         return CreateTurn(turn=turn)

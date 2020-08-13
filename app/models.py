@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from datetime import datetime, date, timedelta
 
@@ -43,6 +44,24 @@ class Store(models.Model):
     opening_days = MultiSelectField(
         choices=DAY_CHOICES)
     # image = models.ImageField(upload_to=)
+
+    @property
+    def average_wait_time(self):
+        print(self.turns.all())
+        turns = self.turns.filter(~Q(completion_time=None))
+        total_time = [datetime.combine(date.min, turn.completion_time) - datetime.combine(
+            date.min, turn.creation_time) for turn in turns]
+
+        sum = timedelta()
+        for i in total_time:
+            sum += i
+
+        if turns.count() > 0:
+            # print(turns)
+            average_time = sum / turns.count()
+
+            return str((average_time.seconds//60) % 60)
+        return
 
     def __str__(self):
         return self.name

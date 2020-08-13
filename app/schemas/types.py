@@ -1,3 +1,4 @@
+import graphene
 from graphene_django.types import DjangoObjectType
 import graphql_geojson
 
@@ -13,6 +14,8 @@ class TurnType(DjangoObjectType):
 
 
 class StoreType(graphql_geojson.GeoJSONType):
+    average_wait_time = graphene.String()
+
     class Meta:
         model = Store
         geojson_field = 'location'
