@@ -19,7 +19,7 @@ if os.name == 'nt':
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '@tv45djul)*x3*v9swi93_i%e+xu0(d80j&*8c$vc6y3xhe5e4'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -121,8 +121,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-CORS_ORIGIN_WHITELIST = ["http://192.168.0.23:19000",
-                         "http://localhost:19000"]
+CORS_ORIGIN_WHITELIST = []
 
 GRAPHENE = {
     'SCHEMA': 'app.schemas.schema.schema',
@@ -141,8 +140,8 @@ DATABASES = {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'dbcru2mbq9mgk7',
         'USER': 'ydhzzzznrxhdlw',
-        'PASSWORD': 'da066c10cde2918f98c9df77ec96f7b7d25ca89a8a33633ed14e5463e795b58a',
-        'HOST': 'ec2-52-207-25-133.compute-1.amazonaws.com',
+        'PASSWORD': os.environ.get('POSTGRES_PASS'),
+        'HOST': os.environ.get('AWS_HOST'),
         'PORT': '5432',
     }
 }
